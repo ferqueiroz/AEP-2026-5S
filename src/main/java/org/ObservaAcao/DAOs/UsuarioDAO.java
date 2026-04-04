@@ -59,6 +59,10 @@ public class UsuarioDAO {
         }
     }
 
+    public static Usuario buscarUsuario(String nome){
+        return buscarUsuario(nome, "");
+    }
+
     public static Usuario buscarUsuario(String nome, String senha){
         String sql = "SELECT * FROM usuarios WHERE usu_nome = ?";
         if (senha != "") sql += " AND usu_senha = ?";
@@ -100,7 +104,6 @@ public class UsuarioDAO {
             if(resultado.next()) usuario.setId(resultado.getLong(1));
 
             System.out.println("\n✅ Usuário criado com sucesso!\n");
-            leitor.nextLine();
         } catch (Exception e) {
             usuario = null;
             System.out.print("\n❌ Ocorreu um erro ao tentar criar o Usuario!\n\nCausa: ");
@@ -120,7 +123,6 @@ public class UsuarioDAO {
             query.executeUpdate();
 
             System.out.println("\n✅ Usuário atualizado com sucesso!\n");
-            leitor.nextLine();
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar atualizar o Usuario!\n\nCausa: ");
             e.printStackTrace();
@@ -137,8 +139,7 @@ public class UsuarioDAO {
             query.setLong(1, id);
             query.executeUpdate();
 
-            System.out.println("🗑️ Usuário deletado com sucesso!");
-            leitor.nextLine();
+            System.out.println("\n🗑️ Usuário deletado com sucesso!\n");
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar deletar o Usuario!\n\nCausa: ");
             e.printStackTrace();

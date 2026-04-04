@@ -1,21 +1,27 @@
 package org.ObservaAcao;
 
 import org.ObservaAcao.Classes.Categoria;
+import org.ObservaAcao.Classes.Solicitacao;
 import org.ObservaAcao.Classes.Usuario;
 import org.ObservaAcao.DAOs.CategoriaDAO;
+import org.ObservaAcao.DAOs.SolicitacaoDAO;
 import org.ObservaAcao.Utilidades.Funcoes;
 
+import javax.swing.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 
 public class Main {
-    public static Usuario usuarioConectado = new Usuario();
+    public static Usuario usuarioConectado = null;
     public static Scanner leitor = new Scanner(System.in);
 
     public static void solicitacoesMenu(){
         String opcao;
+        String protocolo;
+        Solicitacao solicitacao = null;
 
         do {
             Funcoes.limparConsole();
@@ -33,10 +39,14 @@ public class Main {
 
                     switch (opcao){
                         case "1":
+                            Solicitacao.manutencaoSolicitacao();
                             break;
                         case "2":
+                            Solicitacao.listarSolicitacoes(usuarioConectado.getId());
+                            Funcoes.pressioneVoltar();
                             break;
                         case "3":
+                            Solicitacao.buscarSolicitacaoPorProtocolo();
                             break;
                         case "0":
                             return;
@@ -48,14 +58,18 @@ public class Main {
                 case GERENTE:
                     System.out.println("1 - Listar Todas as Solicitações");
                     System.out.println("2 - Buscar Solicitação por Protocolo");
+                    System.out.println("3 - Mudar Status e Responder Solicitações");
                     System.out.println("0 - Voltar\n");
                     System.out.print("Opção: ");
                     opcao = leitor.nextLine();
 
                     switch (opcao){
                         case "1":
+                            Solicitacao.listarSolicitacoes();
+                            Funcoes.pressioneVoltar();
                             break;
                         case "2":
+                            Solicitacao.buscarSolicitacaoPorProtocolo();
                             break;
                         case "0":
                             return;
