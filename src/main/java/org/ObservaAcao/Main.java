@@ -1,22 +1,147 @@
 package org.ObservaAcao;
 
+import org.ObservaAcao.Classes.Categoria;
 import org.ObservaAcao.Classes.Usuario;
-import org.ObservaAcao.DAOs.UsuarioDAO;
+import org.ObservaAcao.DAOs.CategoriaDAO;
 import org.ObservaAcao.Utilidades.Funcoes;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+
 public class Main {
-    static void main() throws IOException, InterruptedException {
+    public static Usuario usuarioConectado = new Usuario();
+    public static Scanner leitor = new Scanner(System.in);
+
+    public static void solicitacoesMenu(){
         String opcao;
-        Usuario usuarioConectado = new Usuario();
-        Scanner leitor = new Scanner(System.in);
 
         do {
-            Funcoes.LimparConsole();
+            Funcoes.limparConsole();
 
-            System.out.println("-=MENU=-\n");
+            System.out.println("-=Menu de Solicitações=-\n");
+            switch (usuarioConectado.getTipoUsuario()) {
+                case CIDADAO:
+                    System.out.println("1 - Criar Solicitação");
+                    System.out.println("2 - Listar Todas as Solicitações");
+                    System.out.println("3 - Buscar Solicitação por Protocolo");
+                    System.out.println("0 - Voltar\n");
+                    System.out.print("Opção: ");
+
+                    opcao = leitor.nextLine();
+
+                    switch (opcao){
+                        case "1":
+                            break;
+                        case "2":
+                            break;
+                        case "3":
+                            break;
+                        case "0":
+                            return;
+                        default:
+                            continue;
+                    }
+
+                    break;
+                case GERENTE:
+                    System.out.println("1 - Listar Todas as Solicitações");
+                    System.out.println("2 - Buscar Solicitação por Protocolo");
+                    System.out.println("0 - Voltar\n");
+                    System.out.print("Opção: ");
+                    opcao = leitor.nextLine();
+
+                    switch (opcao){
+                        case "1":
+                            break;
+                        case "2":
+                            break;
+                        case "0":
+                            return;
+                        default:
+                            continue;
+                    }
+
+                    break;
+                default:
+                    return;
+            }
+        } while (opcao != "0");
+    }
+
+    public static void categoriasMenu(){
+        String opcao;
+        Long id;
+
+        do {
+            Funcoes.limparConsole();
+
+            System.out.println("-=Menu de Categorias=-\n");
+            switch (usuarioConectado.getTipoUsuario()) {
+                case CIDADAO:
+                    return;
+                case GERENTE:
+                    System.out.println("1 - Listar Categorias");
+                    System.out.println("2 - Criar Categoria");
+                    System.out.println("3 - Atualizar Categoria");
+                    System.out.println("4 - Deletar Categoria");
+                    System.out.println("0 - Voltar\n");
+                    System.out.print("Opção: ");
+
+                    opcao = leitor.nextLine();
+
+                    switch (opcao){
+                        case "1":
+                            Categoria.listarCategorias();
+                            Funcoes.pressioneVoltar();
+                            break;
+                        case "2":
+                            Categoria.manutencaoCategoria();
+                            break;
+                        case "3":
+                            Categoria.listarCategorias();
+                            System.out.print("Digite o código da categoria (0 para voltar): ");
+
+                            id = leitor.nextLong();
+
+                            if (id == 0) continue;
+
+                            if (!Categoria.validaCategoria(id)) continue;
+
+                            Categoria.manutencaoCategoria(id);
+                            break;
+                        case "4":
+                            Categoria.listarCategorias();
+                            System.out.print("Digite o código da categoria (0 para voltar): ");
+
+                            id = leitor.nextLong();
+
+                            if (id == 0) continue;
+
+                            if (!Categoria.validaCategoria(id)) continue;
+
+                            CategoriaDAO.deletarCategoria(id);
+                            break;
+                        case "0":
+                            return;
+                        default:
+                            continue;
+                    }
+                    break;
+                default:
+                    return;
+            }
+        } while (opcao != "0");
+    }
+
+    static void main() {
+        String opcao;
+
+        do {
+            Funcoes.limparConsole();
+
+            System.out.println("-=Menu=-\n");
             System.out.println("1 - Login");
             System.out.println("2 - Registrar");
             System.out.println("0 - Sair");
@@ -36,5 +161,51 @@ public class Main {
                     continue;
             }
         } while (opcao != "0" && usuarioConectado == null);
+
+        do {
+            Funcoes.limparConsole();
+            System.out.println("-=Menu=-\n");
+            switch (usuarioConectado.getTipoUsuario()){
+                case CIDADAO:
+                    System.out.println("1 - Solicitações");
+                    System.out.println("0 - Sair\n");
+                    System.out.print("Opção: ");
+                    opcao = leitor.nextLine();
+
+                    switch (opcao){
+                        case "1":
+                            solicitacoesMenu();
+                            break;
+                        case "0":
+                            return;
+                        default:
+                            continue;
+                    }
+
+                    break;
+                case GERENTE:
+                    System.out.println("1 - Solicitações");
+                    System.out.println("2 - Categorias");
+                    System.out.println("0 - Sair\n");
+                    System.out.print("Opção: ");
+                    opcao = leitor.nextLine();
+
+                    switch (opcao){
+                        case "1":
+                            solicitacoesMenu();
+                            break;
+                        case "2":
+                            categoriasMenu();
+                            break;
+                        case "0":
+                            return;
+                        default:
+                            continue;
+                    }
+                    break;
+                default:
+                    return;
+            }
+        } while(opcao != "0");
     }
 }

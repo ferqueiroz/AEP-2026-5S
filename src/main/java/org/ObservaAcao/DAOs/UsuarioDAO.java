@@ -8,8 +8,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class UsuarioDAO {
+    private static Scanner leitor = new Scanner(System.in);
 
     public static List<Usuario> listarUsuarios(){
         List<Usuario> listaUsuarios = new ArrayList<>();
@@ -27,7 +29,9 @@ public class UsuarioDAO {
                 );
             }
         } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar listar os Usuarios!\n\nCausa: ");
             e.printStackTrace();
+            leitor.nextLine();
         }
 
         return listaUsuarios;
@@ -48,7 +52,9 @@ public class UsuarioDAO {
                     usuario.getString("usu_tipo")
                 ) : null;
         } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar buscar o Usuario!\n\nCausa: ");
             e.printStackTrace();
+            leitor.nextLine();
             return null;
         }
     }
@@ -72,23 +78,34 @@ public class UsuarioDAO {
                         usuario.getString("usu_tipo")
                 ) : null;
         } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar buscar o Usuario!\n\nCausa: ");
             e.printStackTrace();
+            leitor.nextLine();
             return null;
         }
     }
 
     public static void criarUsuario(Usuario usuario) {
         try (Connection conexao = Conexao.getConexao();
-             PreparedStatement query = conexao.prepareStatement("INSERT INTO usuarios (usu_nome, usu_senha, usu_tipo) VALUES (?, ?, ?)")) {
+             PreparedStatement query = conexao.prepareStatement("INSERT INTO usuarios (usu_nome, usu_senha, usu_tipo) VALUES (?, ?, ?)",
+                                               PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             query.setString(1, usuario.getNome());
             query.setString(2, usuario.getSenha());
             query.setString(3, usuario.getTipoUsuario().getTipoUsuario());
             query.executeUpdate();
 
+            ResultSet resultado = query.getGeneratedKeys();
+
+            if(resultado.next()) usuario.setId(resultado.getLong(1));
+
             System.out.println("\n✅ Usuário criado com sucesso!\n");
+            leitor.nextLine();
         } catch (Exception e) {
+            usuario = null;
+            System.out.print("\n❌ Ocorreu um erro ao tentar criar o Usuario!\n\nCausa: ");
             e.printStackTrace();
+            leitor.nextLine();
         }
     }
 
@@ -103,23 +120,29 @@ public class UsuarioDAO {
             query.executeUpdate();
 
             System.out.println("\n✅ Usuário atualizado com sucesso!\n");
+            leitor.nextLine();
         } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar atualizar o Usuario!\n\nCausa: ");
             e.printStackTrace();
+            leitor.nextLine();
         }
     }
 
     public static void deletarUsuario(Long id) {
         String sql = "DELETE FROM usuarios WHERE usu_id = ?";
 
-        try (Connection conn = Conexao.getConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.getConexao();
+             PreparedStatement query = conexao.prepareStatement(sql)) {
 
-            stmt.setLong(1, id);
-            stmt.executeUpdate();
+            query.setLong(1, id);
+            query.executeUpdate();
 
             System.out.println("🗑️ Usuário deletado com sucesso!");
+            leitor.nextLine();
         } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar deletar o Usuario!\n\nCausa: ");
             e.printStackTrace();
+            leitor.nextLine();
         }
     }
 }

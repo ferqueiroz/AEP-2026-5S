@@ -4,7 +4,6 @@ import org.ObservaAcao.DAOs.UsuarioDAO;
 import org.ObservaAcao.Enums.TipoUsuario;
 import org.ObservaAcao.Utilidades.Funcoes;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 public class Usuario {
@@ -58,35 +57,28 @@ public class Usuario {
     }
 
     public void definirNome(){
-        boolean nomeValido;
         String nome;
 
         do {
             System.out.print("Nome do Usuário: ");
             nome = leitor.nextLine();
-
-            nomeValido = nome != "";
-        } while (!nomeValido);
+        } while (nome == "");
 
         setNome(nome);
     }
 
     public void definirSenha(){
-        boolean senhaValido;
         String senha;
 
         do {
             System.out.print("Senha do Usuário: ");
             senha = leitor.nextLine();
-
-            senhaValido = senha != "";
-        } while (!senhaValido);
+        } while (senha == "");
 
         setSenha(senha);
     }
 
     public void definirTipoUsuario(){
-        boolean tipoUsuarioValido = false;
         TipoUsuario tipoUsuario = null;
 
         do {
@@ -106,21 +98,18 @@ public class Usuario {
                 default:
                     continue;
             }
-
-            tipoUsuarioValido = true;
-        } while (!tipoUsuarioValido);
+        } while (tipoUsuario == null);
 
         setTipoUsuario(tipoUsuario);
     }
 
     public static Usuario logarUsuario() {
-        boolean usuarioValido;
-        Usuario usuario = null;
+        Usuario usuario;
 
         do {
             usuario = new Usuario();
 
-            Funcoes.LimparConsole();
+            Funcoes.limparConsole();
             System.out.println("-=Login=-\n");
 
             usuario.definirNome();
@@ -128,22 +117,20 @@ public class Usuario {
 
             usuario = UsuarioDAO.buscarUsuario(usuario.getNome(), usuario.getSenha());
 
-            usuarioValido = usuario != null;
-
-            if (!usuarioValido) {
+            if (usuario == null) {
                 System.out.println("\nUsuário inválido!\n");
                 System.out.print("Pressione ENTER para continuar...");
                 leitor.nextLine();
             }
-        } while (!usuarioValido);
+        } while (usuario == null);
 
         return usuario;
     }
 
     public static Usuario registrarUsuario() {
-        Funcoes.LimparConsole();
         Usuario usuario = new Usuario();
 
+        Funcoes.limparConsole();
         System.out.println("-=Registrar=-\n");
 
         usuario.definirNome();
@@ -151,6 +138,6 @@ public class Usuario {
         usuario.definirTipoUsuario();
 
         UsuarioDAO.criarUsuario(usuario);
-        return UsuarioDAO.buscarUsuario(usuario.getNome(), usuario.getSenha());
+        return usuario;
     }
 }
