@@ -8,6 +8,7 @@ import org.ObservaAcao.DAOs.SolicitacaoDAO;
 import org.ObservaAcao.Utilidades.Funcoes;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,9 @@ public class Main {
                 case CIDADAO:
                     System.out.println("1 - Criar Solicitação");
                     System.out.println("2 - Listar Todas as Solicitações");
-                    System.out.println("3 - Buscar Solicitação por Protocolo");
-                    System.out.println("4 - Deletar Solicitação");
+                    System.out.println("3 - Listar Todas as Solicitações (Mais Detalhes)");
+                    System.out.println("4 - Buscar Solicitação por Protocolo");
+                    System.out.println("5 - Deletar Solicitação");
                     System.out.println("0 - Voltar\n");
                     System.out.print("Opção: ");
 
@@ -41,14 +43,18 @@ public class Main {
                             Solicitacao.manutencaoSolicitacao();
                             break;
                         case "2":
-                            Solicitacao.listarSolicitacoes(usuarioConectado.getId());
+                            Solicitacao.listarSolicitacoes(usuarioConectado.getId(), false);
                             Funcoes.pressioneVoltar();
                             break;
                         case "3":
-                            Solicitacao.buscarSolicitacaoPorProtocolo();
+                            Solicitacao.listarSolicitacoes(usuarioConectado.getId(), true);
                             Funcoes.pressioneVoltar();
                             break;
                         case "4":
+                            Solicitacao.buscarSolicitacaoPorProtocolo();
+                            Funcoes.pressioneVoltar();
+                            break;
+                        case "5":
                             Solicitacao.deletarSolicitacao();
                             break;
                         case "0":
@@ -60,22 +66,27 @@ public class Main {
                     break;
                 case GERENTE:
                     System.out.println("1 - Listar Todas as Solicitações");
-                    System.out.println("2 - Buscar Solicitação por Protocolo");
-                    System.out.println("3 - Mudar Status e Responder Solicitações");
+                    System.out.println("2 - Listar Todas as Solicitações (Mais Detalhes)");
+                    System.out.println("3 - Buscar Solicitação por Protocolo");
+                    System.out.println("4 - Mudar Status e Responder Solicitações");
                     System.out.println("0 - Voltar\n");
                     System.out.print("Opção: ");
                     opcao = leitor.nextLine();
 
                     switch (opcao){
                         case "1":
-                            Solicitacao.listarSolicitacoes();
+                            Solicitacao.listarSolicitacoes(false);
                             Funcoes.pressioneVoltar();
                             break;
                         case "2":
-                            Solicitacao.buscarSolicitacaoPorProtocolo();
+                            Solicitacao.listarSolicitacoes(true);
                             Funcoes.pressioneVoltar();
                             break;
                         case "3":
+                            Solicitacao.buscarSolicitacaoPorProtocolo();
+                            Funcoes.pressioneVoltar();
+                            break;
+                        case "4":
                             Solicitacao.mudarStatusResponderSolicitacao();
                             Funcoes.pressioneVoltar();
                             break;
@@ -157,32 +168,8 @@ public class Main {
         } while (opcao != "0");
     }
 
-    static void main() {
+    public static void menu(){
         String opcao;
-
-        do {
-            Funcoes.limparConsole();
-
-            System.out.println("-=Menu=-\n");
-            System.out.println("1 - Login");
-            System.out.println("2 - Registrar");
-            System.out.println("0 - Sair");
-            System.out.print("\nOpção: ");
-            opcao = leitor.nextLine();
-
-            switch (opcao){
-                case "1":
-                    usuarioConectado = Usuario.logarUsuario();
-                    break;
-                case "2":
-                    usuarioConectado = Usuario.registrarUsuario();
-                    break;
-                case "0":
-                    return;
-                default:
-                    continue;
-            }
-        } while (opcao != "0" && usuarioConectado == null);
 
         do {
             Funcoes.limparConsole();
@@ -229,5 +216,36 @@ public class Main {
                     return;
             }
         } while(opcao != "0");
+    }
+
+    static void main() {
+        String opcao;
+
+        do {
+            Funcoes.limparConsole();
+
+            System.out.println("-=Menu=-\n");
+            System.out.println("1 - Login");
+            System.out.println("2 - Registrar");
+            System.out.println("0 - Sair");
+            System.out.print("\nOpção: ");
+            opcao = leitor.nextLine();
+
+            switch (opcao){
+                case "1":
+                    usuarioConectado = Usuario.logarUsuario();
+                    break;
+                case "2":
+                    usuarioConectado = Usuario.registrarUsuario();
+                    break;
+                case "0":
+                    return;
+                default:
+                    continue;
+            }
+
+            menu();
+        } while (opcao != "0");
+
     }
 }

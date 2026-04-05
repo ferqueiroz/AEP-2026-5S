@@ -19,7 +19,7 @@ public class HistoricoStatusSolicitacaoDAO {
         List<HistoricoStatusSolicitacao> listaSolicitacoes = new ArrayList<>();
 
         try (Connection conexao = Conexao.getConexao();
-             PreparedStatement query = conexao.prepareStatement("SELECT * FROM historicostatussolicitacao WHERE hss_solicitacao = ? ORDER BY hss_datamudanca DESC")) {
+             PreparedStatement query = conexao.prepareStatement("SELECT * FROM historicostatussolicitacao WHERE hss_solicitacao = ? ORDER BY hss_datamudanca")) {
 
             query.setLong(1, solicitacao);
             ResultSet histStatusSolic = query.executeQuery();
@@ -29,15 +29,16 @@ public class HistoricoStatusSolicitacaoDAO {
                         histStatusSolic.getLong("hss_id"),
                         SolicitacaoDAO.buscarSolicitacao(histStatusSolic.getLong("hss_solicitacao")),
                         UsuarioDAO.buscarUsuario(histStatusSolic.getLong("hss_gerente")),
-                        StatusSolicitacao.valueOf(histStatusSolic.getString("hss_status")),
+                        StatusSolicitacao.fromString(histStatusSolic.getString("hss_status")),
                         histStatusSolic.getTimestamp("hss_dataMudanca").toLocalDateTime(),
-                        histStatusSolic.getString("hss_resposta")
+                        histStatusSolic.getString("hss_resposta"),
+                        histStatusSolic.getTimestamp("hss_datafinalizacao").toLocalDateTime()
                 ));
             }
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar listar os Históricos de Status da Solicitacão!\n\nCausa: ");
             e.printStackTrace();
-            leitor.nextLine();
+            Funcoes.pressioneContinuar();
         }
 
         return listaSolicitacoes;
@@ -47,8 +48,8 @@ public class HistoricoStatusSolicitacaoDAO {
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement query = conexao.prepareStatement(
                      "INSERT INTO historicostatussolicitacao " +
-                         "(hss_solicitacao, hss_gerente, hss_status, hss_dataMudanca, hss_resposta) " +
-                         "VALUES (?, ?, ?, ?, ?)",
+                         "(hss_solicitacao, hss_gerente, hss_status, hss_datamudanca, hss_resposta, hss_datafinalizacao) " +
+                         "VALUES (?, ?, ?, ?, ?, ?)",
                      PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             query.setLong(1, historico.getSolicitacao().getId());
@@ -57,6 +58,8 @@ public class HistoricoStatusSolicitacaoDAO {
             query.setString(3, historico.getStatus().getStatusSolicitacao());
             query.setTimestamp(4, Timestamp.valueOf(historico.getDataMudanca()));
             query.setString(5, historico.getResposta());
+            if (historico.getDataFinalizacao() != null) query.setTimestamp(6, Timestamp.valueOf(historico.getDataFinalizacao()));
+            else query.setNull(6, Types.TIMESTAMP);
             query.executeUpdate();
 
             ResultSet resultado = query.getGeneratedKeys();
@@ -66,7 +69,7 @@ public class HistoricoStatusSolicitacaoDAO {
             historico = null;
             System.out.print("\n❌ Ocorreu um erro ao tentar criar o Histórico de Status da Solicitação!\n\nCausa: ");
             e.printStackTrace();
-            leitor.nextLine();
+            Funcoes.pressioneContinuar();
         }
     }
 
@@ -74,7 +77,7 @@ public class HistoricoStatusSolicitacaoDAO {
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement query = conexao.prepareStatement(
                      "UPDATE historicostatussolicitacao " +
-                         "   SET hss_solicitacao = ?, hss_gerente = ?, hss_status = ?, hss_dataMudanca = ?, hss_resposta = ? " +
+                         "   SET hss_solicitacao = ?, hss_gerente = ?, hss_status = ?, hss_dataMudanca = ?, hss_resposta = ?, hss_datafinalizacao = ? " +
                          " WHERE hss_id = ?")) {
 
             query.setLong(1, historico.getSolicitacao().getId());
@@ -83,12 +86,14 @@ public class HistoricoStatusSolicitacaoDAO {
             query.setString(3, historico.getStatus().getStatusSolicitacao());
             query.setTimestamp(4, Timestamp.valueOf(historico.getDataMudanca()));
             query.setString(5, historico.getResposta());
-            query.setLong(6, id);
+            if (historico.getDataFinalizacao() != null) query.setTimestamp(6, Timestamp.valueOf(historico.getDataFinalizacao()));
+            else query.setNull(6, Types.TIMESTAMP);
+            query.setLong(7, id);
             query.executeUpdate();
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar atualizar o Histórico de Status da Solicitação!\n\nCausa: ");
             e.printStackTrace();
-            leitor.nextLine();
+            Funcoes.pressioneContinuar();
         }
     }
 
@@ -99,18 +104,21 @@ public class HistoricoStatusSolicitacaoDAO {
             query.setLong(1, solicitacao);
             ResultSet status = query.executeQuery();
 
+            if (!status.next()) return null;
+
             return new HistoricoStatusSolicitacao(
                     status.getLong("hss_id"),
                     SolicitacaoDAO.buscarSolicitacao(status.getLong("hss_solicitacao")),
                     UsuarioDAO.buscarUsuario(status.getLong("hss_gerente")),
-                    StatusSolicitacao.valueOf(status.getString("hss_status")),
-                    status.getTimestamp("hss_id").toLocalDateTime(),
-                    status.getString("hss_resposta")
+                    StatusSolicitacao.fromString(status.getString("hss_status")),
+                    status.getTimestamp("hss_datamudanca").toLocalDateTime(),
+                    status.getString("hss_resposta"),
+                    status.getTimestamp("hss_datafinalizacao").toLocalDateTime()
                     );
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar buscar o último status da Solicitação!\n\nCausa: ");
             e.printStackTrace();
-            leitor.nextLine();
+            Funcoes.pressioneContinuar();
             return null;
         }
     }
@@ -123,7 +131,7 @@ public class HistoricoStatusSolicitacaoDAO {
             ResultSet status = query.executeQuery();
 
             if (status.next()) {
-                switch (StatusSolicitacao.valueOf(status.getString("hss_status"))) {
+                switch (StatusSolicitacao.fromString(status.getString("hss_status"))) {
                     case ATENDIMENTO:
                         return StatusSolicitacao.TRIAGEM;
                     case TRIAGEM:
@@ -141,7 +149,7 @@ public class HistoricoStatusSolicitacaoDAO {
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar buscar o próximo status da Solicitação!\n\nCausa: ");
             e.printStackTrace();
-            leitor.nextLine();
+            Funcoes.pressioneContinuar();
             return null;
         }
 

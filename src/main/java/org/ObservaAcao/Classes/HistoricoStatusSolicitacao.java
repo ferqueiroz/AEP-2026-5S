@@ -3,6 +3,7 @@ package org.ObservaAcao.Classes;
 import org.ObservaAcao.Enums.StatusSolicitacao;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class HistoricoStatusSolicitacao {
@@ -12,6 +13,7 @@ public class HistoricoStatusSolicitacao {
     private StatusSolicitacao status;
     private LocalDateTime dataMudanca;
     private String resposta;
+    private LocalDateTime dataFinalizacao;
 
     private static Scanner leitor = new Scanner(System.in);
 
@@ -26,13 +28,24 @@ public class HistoricoStatusSolicitacao {
         setResposta(resposta);
     }
 
-    public HistoricoStatusSolicitacao(Long id, Solicitacao solicitacao, Usuario gerente, StatusSolicitacao status, LocalDateTime dataMudanca, String resposta) {
+    @Override
+    public String toString() {
+        System.out.printf("Gerente: %s | ", this.gerente != null ? this.gerente.getNome() : "");
+        System.out.printf("Status: %s | ", this.status.getStatusSolicitacao());
+        System.out.printf("Data Mudança: %s | ", this.dataMudanca.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+        System.out.printf("Data Finalização: %s\n", this.dataFinalizacao != null ? this.dataFinalizacao.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) : "");
+        System.out.printf("Resposta: %s\n", this.resposta != null ? this.resposta : "");
+        return "";
+    }
+
+    public HistoricoStatusSolicitacao(Long id, Solicitacao solicitacao, Usuario gerente, StatusSolicitacao status, LocalDateTime dataMudanca, String resposta, LocalDateTime dataFinalizacao) {
         this.id = id;
         this.solicitacao = solicitacao;
         this.gerente = gerente;
         this.status = status;
         this.dataMudanca = dataMudanca;
         this.resposta = resposta;
+        this.dataFinalizacao = dataFinalizacao;
     }
 
     public HistoricoStatusSolicitacao() {
@@ -84,5 +97,13 @@ public class HistoricoStatusSolicitacao {
 
     public void setResposta(String resposta) {
         this.resposta = resposta;
+    }
+
+    public LocalDateTime getDataFinalizacao() {
+        return dataFinalizacao;
+    }
+
+    public void setDataFinalizacao(LocalDateTime dataFinalizacao) {
+        this.dataFinalizacao = dataFinalizacao;
     }
 }

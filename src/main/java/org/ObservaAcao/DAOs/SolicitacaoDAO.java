@@ -44,7 +44,7 @@ public class SolicitacaoDAO {
                         solicitacoes.getString("slc_descricao"),
                         solicitacoes.getBytes("slc_anexo"),
                         solicitacoes.getInt("slc_prioridade"),
-                        StatusSolicitacao.valueOf(solicitacoes.getString("slc_status")),
+                        StatusSolicitacao.fromString(solicitacoes.getString("slc_status")),
                         solicitacoes.getString("slc_localizacao")
                 ));
             }
@@ -73,7 +73,7 @@ public class SolicitacaoDAO {
                             solicitacao.getString("slc_descricao"),
                             solicitacao.getBytes("slc_anexo"),
                             solicitacao.getInt("slc_prioridade"),
-                            StatusSolicitacao.valueOf(solicitacao.getString("slc_status")),
+                            StatusSolicitacao.fromString(solicitacao.getString("slc_status")),
                             solicitacao.getString("slc_localizacao")
 
                     ) : null;
@@ -101,7 +101,7 @@ public class SolicitacaoDAO {
                             solicitacao.getString("slc_descricao"),
                             solicitacao.getBytes("slc_anexo"),
                             solicitacao.getInt("slc_prioridade"),
-                            StatusSolicitacao.valueOf(solicitacao.getString("slc_status")),
+                            StatusSolicitacao.fromString(solicitacao.getString("slc_status")),
                             solicitacao.getString("slc_localizacao")
                     ) : null;
         } catch (Exception e) {
@@ -153,7 +153,8 @@ public class SolicitacaoDAO {
                          "   SET slc_usuario = ?, slc_protocolo = ?, slc_categoria = ?, slc_descricao = ?, slc_anexo = ?, slc_prioridade = ?, slc_status = ?, slc_localizacao = ? " +
                          " WHERE slc_id = ?")) {
 
-            query.setLong(1, solicitacao.getUsuario().getId());
+            if (solicitacao.getUsuario() != null) query.setLong(1, solicitacao.getUsuario().getId());
+            else query.setNull(1, Types.BIGINT);
             query.setString(2, solicitacao.getProtocolo());
             query.setLong(3, solicitacao.getCategoria().getId());
             query.setString(4, solicitacao.getDescricao());
@@ -164,8 +165,6 @@ public class SolicitacaoDAO {
             query.setLong(9, id);
             query.executeUpdate();
 
-            System.out.println("\n✅ Solicitacao atualizada com sucesso!\n");
-            Funcoes.pressioneContinuar();
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar atualizar a Solicitacao!\n\nCausa: ");
             e.printStackTrace();

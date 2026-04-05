@@ -16,4 +16,14 @@ public enum StatusSolicitacao {
     public String getStatusSolicitacao() {
         return StatusSolicitacao;
     }
+
+    public static StatusSolicitacao fromString(String valor) {
+        for (StatusSolicitacao status : values()) {
+            if (status.getStatusSolicitacao().equalsIgnoreCase(valor)) {
+                return status;
+            }
+        }
+
+        throw new IllegalArgumentException("Status inválido: " + valor);
+    }
 }

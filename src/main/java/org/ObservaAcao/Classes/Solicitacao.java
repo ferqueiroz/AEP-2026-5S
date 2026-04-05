@@ -41,14 +41,14 @@ public class Solicitacao {
         System.out.printf("Localização: %s\n\n", this.localizacao);
 
         List<HistoricoStatusSolicitacao> statusSolicitacao = HistoricoStatusSolicitacaoDAO.listarHistoricoStatusSolicitacao(this.id);
+        String historicoStatus = "";
+
+        for (HistoricoStatusSolicitacao status : statusSolicitacao){
+            historicoStatus += (historicoStatus == "" ? "" : " -> ") + status.getStatus().getStatusSolicitacao();
+        }
 
         System.out.println("Histórico de Status:\n");
-        for (HistoricoStatusSolicitacao historico : statusSolicitacao){
-            System.out.printf("Status: %s | ", historico.getStatus().getStatusSolicitacao());
-            System.out.printf("Gerente: %s | ", historico.getGerente() == null ? "" : historico.getGerente().getNome());
-            System.out.printf("Data Hora Mudança: %1$td/%1$tm/%1$tY %1$tH:%1$tM\n", historico.getDataMudanca());
-            System.out.printf("Resposta: %s\n", historico.getResposta() == null ? "" : historico.getResposta());
-        }
+        System.out.print(historicoStatus);
 
         return "";
     }
@@ -140,11 +140,11 @@ public class Solicitacao {
         this.localizacao = localizacao;
     }
 
-    public static void listarSolicitacoes(){
-        listarSolicitacoes(0L);
+    public static void listarSolicitacoes(boolean visualizarDetalhes){
+        listarSolicitacoes(0L, visualizarDetalhes);
     }
 
-    public static void listarSolicitacoes(Long usuario){
+    public static void listarSolicitacoes(Long usuario, boolean visualizarDetalhes){
         List<Solicitacao> solicitacoes = SolicitacaoDAO.listarSolicitacoes(usuario);
 
         if (solicitacoes.isEmpty()){
@@ -156,6 +156,15 @@ public class Solicitacao {
         System.out.println("-=Solicitações=-\n");
         for (Solicitacao solicitacao : solicitacoes){
             System.out.println(solicitacao);
+
+            if (visualizarDetalhes) {
+                System.out.println();
+
+                List<HistoricoStatusSolicitacao> historicoStatus = HistoricoStatusSolicitacaoDAO.listarHistoricoStatusSolicitacao(solicitacao.getId());
+                for (HistoricoStatusSolicitacao status : historicoStatus){
+                    System.out.println(status);
+                }
+            }
         }
 
         System.out.println("---------------\n");
@@ -244,8 +253,6 @@ public class Solicitacao {
             if (resultado == JFileChooser.APPROVE_OPTION) {
                 arquivo = fileChooser.getSelectedFile();
             }
-
-            System.out.println("depois depois");
         } while (arquivo == null) ;
 
         try {
@@ -343,16 +350,20 @@ public class Solicitacao {
 
     public static void mudarStatusResponderSolicitacao(){
         Solicitacao solicitacao;
-        Solicitacao.listarSolicitacoes();
+        StatusSolicitacao proximoStatus;
+
+        Solicitacao.listarSolicitacoes(false);
         Long id;
 
         while(true) {
-            System.out.print("Digite o ID da solicitação: ");
+            System.out.print("Digite o ID da solicitação (0 para voltar): ");
             try {
                 id = leitor.nextLong();
             } catch (Exception e) {
                 continue;
             }
+
+            if (id == 0) return;
 
             solicitacao = SolicitacaoDAO.buscarSolicitacao(id);
 
@@ -362,27 +373,38 @@ public class Solicitacao {
                 continue;
             }
 
+            proximoStatus = HistoricoStatusSolicitacaoDAO.buscarProximoStatusSolicitacao(solicitacao.getId());
+
+            if (proximoStatus == null){
+                System.out.println("\nA Solicitação já está no status de encerrado!\n");
+                Funcoes.pressioneContinuar();
+                continue;
+            }
+
             break;
         }
 
-        HistoricoStatusSolicitacao statusSolicitacao = new HistoricoStatusSolicitacao();
-
-        statusSolicitacao.setSolicitacao(solicitacao);
+        HistoricoStatusSolicitacao statusSolicitacao;
+        statusSolicitacao = HistoricoStatusSolicitacaoDAO.buscarUltimoStatusSolicitacao(solicitacao.getId());
         statusSolicitacao.setGerente(Main.usuarioConectado);
-        statusSolicitacao.setDataMudanca(LocalDateTime.now());
-        statusSolicitacao.setStatus(HistoricoStatusSolicitacaoDAO.buscarProximoStatusSolicitacao(solicitacao.getId()));
+        statusSolicitacao.setDataFinalizacao(LocalDateTime.now());
+        statusSolicitacao.definirResposta();
+        HistoricoStatusSolicitacaoDAO.atualizarHistoricoStatusSolicitacao(statusSolicitacao.getId(), statusSolicitacao);
 
+        solicitacao.setStatus(proximoStatus);
+        SolicitacaoDAO.atualizarSolicitacao(solicitacao.getId(), solicitacao);
+
+        statusSolicitacao = new HistoricoStatusSolicitacao();
+        statusSolicitacao.setSolicitacao(solicitacao);
+        statusSolicitacao.setDataMudanca(LocalDateTime.now());
+        statusSolicitacao.setStatus(proximoStatus);
         HistoricoStatusSolicitacaoDAO.criarHistoricoStatusSolicitacao(statusSolicitacao);
 
-        statusSolicitacao = HistoricoStatusSolicitacaoDAO.buscarUltimoStatusSolicitacao(solicitacao.getId());
-
-        statusSolicitacao.definirResposta();
-
-        HistoricoStatusSolicitacaoDAO.atualizarHistoricoStatusSolicitacao(statusSolicitacao.getId(), statusSolicitacao);
+        System.out.println("\n✅ Status da Solicitação atualizada com sucesso!\n");
     }
 
     public static void deletarSolicitacao(){
-        Solicitacao.listarSolicitacoes(Main.usuarioConectado.getId());
+        Solicitacao.listarSolicitacoes(Main.usuarioConectado.getId(), false);
 
         Long id;
 
