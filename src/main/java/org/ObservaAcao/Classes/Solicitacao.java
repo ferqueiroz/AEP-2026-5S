@@ -25,6 +25,7 @@ public class Solicitacao {
     private byte[] anexo;
     private int prioridade;
     private StatusSolicitacao status;
+    private String localizacao;
 
     private static Scanner leitor = new Scanner(System.in);
 
@@ -36,12 +37,13 @@ public class Solicitacao {
         System.out.printf("Categoria: %s\n", this.categoria.getDescricao());
         System.out.printf("Descrição: %s\n", this.descricao);
         System.out.printf("Prioridade: %s\n", this.prioridade);
-        System.out.printf("Status: %s\n\n", this.status.getStatusSolicitacao());
+        System.out.printf("Status: %s\n", this.status.getStatusSolicitacao());
+        System.out.printf("Localização: %s\n\n", this.localizacao);
 
-        List<HistoricoStatusSolicitacao> historicos = HistoricoStatusSolicitacaoDAO.listarHistoricoStatusSolicitacao(this.id);
+        List<HistoricoStatusSolicitacao> statusSolicitacao = HistoricoStatusSolicitacaoDAO.listarHistoricoStatusSolicitacao(this.id);
+
         System.out.println("Histórico de Status:\n");
-
-        for (HistoricoStatusSolicitacao historico : historicos){
+        for (HistoricoStatusSolicitacao historico : statusSolicitacao){
             System.out.printf("Status: %s | ", historico.getStatus().getStatusSolicitacao());
             System.out.printf("Gerente: %s | ", historico.getGerente() == null ? "" : historico.getGerente().getNome());
             System.out.printf("Data Hora Mudança: %1$td/%1$tm/%1$tY %1$tH:%1$tM\n", historico.getDataMudanca());
@@ -51,7 +53,7 @@ public class Solicitacao {
         return "";
     }
 
-    public Solicitacao(Long id, Usuario usuario, String protocolo, Categoria categoria, String descricao, byte[] anexo, int prioridade, StatusSolicitacao status) {
+    public Solicitacao(Long id, Usuario usuario, String protocolo, Categoria categoria, String descricao, byte[] anexo, int prioridade, StatusSolicitacao status, String localizacao) {
         this.id = id;
         this.usuario = usuario;
         this.protocolo = protocolo;
@@ -60,6 +62,7 @@ public class Solicitacao {
         this.anexo = anexo;
         this.prioridade = prioridade;
         this.status = status;
+        this.localizacao = localizacao;
     }
 
     public Solicitacao() {
@@ -129,6 +132,14 @@ public class Solicitacao {
         this.status = status;
     }
 
+    public String getLocalizacao() {
+        return localizacao;
+    }
+
+    public void setLocalizacao(String localizacao) {
+        this.localizacao = localizacao;
+    }
+
     public static void listarSolicitacoes(){
         listarSolicitacoes(0L);
     }
@@ -138,7 +149,6 @@ public class Solicitacao {
 
         if (solicitacoes.isEmpty()){
             System.out.print("Não existe nenhuma solicitação cadastrada!\n");
-            Funcoes.pressioneVoltar();
             return;
         }
 
@@ -165,9 +175,7 @@ public class Solicitacao {
 
         System.out.println("-=Solicitação=-\n");
         System.out.print(solicitacao);
-        System.out.println("---------------\n");
-
-        Funcoes.pressioneVoltar();
+        System.out.println("\n---------------\n");
     }
 
     public void definirCategoria(){
@@ -256,6 +264,7 @@ public class Solicitacao {
             System.out.print("Prioridade da Solicitação (0 a 10): ");
             try {
                 prioridade = leitor.nextInt();
+                leitor.nextLine();
             } catch (Exception e) {
                 prioridade = -1;
             }
@@ -264,19 +273,49 @@ public class Solicitacao {
         setPrioridade(prioridade);
     }
 
+    public void definirLocalizacao(){
+        String localizacao;
+
+        do {
+            System.out.print("Localização da Solicitação: ");
+            localizacao = leitor.nextLine();
+        } while (localizacao == "");
+
+        setLocalizacao(localizacao);
+    }
+
     public static Solicitacao manutencaoSolicitacao(){
         Solicitacao solicitacao;
 
         do {
             solicitacao = new Solicitacao();
 
-            solicitacao.setUsuario(Main.usuarioConectado);
             solicitacao.setProtocolo(gerarProtocolo());
             solicitacao.definirCategoria();
             solicitacao.definirDescricao();
-            solicitacao.definirAnexo();
+            solicitacao.definirLocalizacao();
             solicitacao.definirPrioridade();
+            solicitacao.definirAnexo();
             solicitacao.setStatus(StatusSolicitacao.ATENDIMENTO);
+
+            int opcao;
+            while(true) {
+                System.out.println("Como deseja enviar a Solicitação:\n");
+                System.out.println("1 - Identificado");
+                System.out.println("2 - Anônimo\n");
+                System.out.print("Opção: ");
+
+                try {
+                    opcao = leitor.nextInt();
+                    leitor.nextLine();
+
+                    if (opcao == 1) {
+                        solicitacao.setUsuario(Main.usuarioConectado);
+                        break;
+                    } else if (opcao == 2) break;
+                } catch (Exception e){
+                }
+            }
 
             SolicitacaoDAO.criarSolicitacao(solicitacao);
 
@@ -300,5 +339,75 @@ public class Solicitacao {
         if (SolicitacaoDAO.buscarSolicitacaoPorProtocolo(protocolo) != null) protocolo = gerarProtocolo();
 
         return protocolo;
+    }
+
+    public static void mudarStatusResponderSolicitacao(){
+        Solicitacao solicitacao;
+        Solicitacao.listarSolicitacoes();
+        Long id;
+
+        while(true) {
+            System.out.print("Digite o ID da solicitação: ");
+            try {
+                id = leitor.nextLong();
+            } catch (Exception e) {
+                continue;
+            }
+
+            solicitacao = SolicitacaoDAO.buscarSolicitacao(id);
+
+            if (solicitacao == null){
+                System.out.println("\nSolicitação não existe!\n");
+                Funcoes.pressioneContinuar();
+                continue;
+            }
+
+            break;
+        }
+
+        HistoricoStatusSolicitacao statusSolicitacao = new HistoricoStatusSolicitacao();
+
+        statusSolicitacao.setSolicitacao(solicitacao);
+        statusSolicitacao.setGerente(Main.usuarioConectado);
+        statusSolicitacao.setDataMudanca(LocalDateTime.now());
+        statusSolicitacao.setStatus(HistoricoStatusSolicitacaoDAO.buscarProximoStatusSolicitacao(solicitacao.getId()));
+
+        HistoricoStatusSolicitacaoDAO.criarHistoricoStatusSolicitacao(statusSolicitacao);
+
+        statusSolicitacao = HistoricoStatusSolicitacaoDAO.buscarUltimoStatusSolicitacao(solicitacao.getId());
+
+        statusSolicitacao.definirResposta();
+
+        HistoricoStatusSolicitacaoDAO.atualizarHistoricoStatusSolicitacao(statusSolicitacao.getId(), statusSolicitacao);
+    }
+
+    public static void deletarSolicitacao(){
+        Solicitacao.listarSolicitacoes(Main.usuarioConectado.getId());
+
+        Long id;
+
+        do {
+            System.out.print("Digite o ID da Solicitação para deletar (0 para voltar): ");
+
+            try {
+                id = leitor.nextLong();
+
+                if (id == 0) return;
+            } catch (Exception e) {
+                id = 0L;
+            }
+        } while (!Solicitacao.validaSolicitacao(id));
+
+        SolicitacaoDAO.deletarSolicitacao(id);
+    }
+
+    public static boolean validaSolicitacao(Long id){
+        if (SolicitacaoDAO.buscarSolicitacao(id) == null) {
+            System.out.println("\nSolicitação não existe!\n");
+            Funcoes.pressioneVoltar();
+            return false;
+        }
+
+        return true;
     }
 }

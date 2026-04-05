@@ -19,7 +19,7 @@ public class HistoricoStatusSolicitacaoDAO {
         List<HistoricoStatusSolicitacao> listaSolicitacoes = new ArrayList<>();
 
         try (Connection conexao = Conexao.getConexao();
-             PreparedStatement query = conexao.prepareStatement("SELECT * FROM historicostatussolicitacao WHERE hss_solicitacao = ?")) {
+             PreparedStatement query = conexao.prepareStatement("SELECT * FROM historicostatussolicitacao WHERE hss_solicitacao = ? ORDER BY hss_datamudanca DESC")) {
 
             query.setLong(1, solicitacao);
             ResultSet histStatusSolic = query.executeQuery();
@@ -70,6 +70,51 @@ public class HistoricoStatusSolicitacaoDAO {
         }
     }
 
+    public static void atualizarHistoricoStatusSolicitacao(Long id, HistoricoStatusSolicitacao historico){
+        try (Connection conexao = Conexao.getConexao();
+             PreparedStatement query = conexao.prepareStatement(
+                     "UPDATE historicostatussolicitacao " +
+                         "   SET hss_solicitacao = ?, hss_gerente = ?, hss_status = ?, hss_dataMudanca = ?, hss_resposta = ? " +
+                         " WHERE hss_id = ?")) {
+
+            query.setLong(1, historico.getSolicitacao().getId());
+            if (historico.getGerente() != null) query.setLong(2, historico.getGerente().getId());
+            else query.setNull(2, Types.BIGINT);
+            query.setString(3, historico.getStatus().getStatusSolicitacao());
+            query.setTimestamp(4, Timestamp.valueOf(historico.getDataMudanca()));
+            query.setString(5, historico.getResposta());
+            query.setLong(6, id);
+            query.executeUpdate();
+        } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar atualizar o Histórico de Status da Solicitação!\n\nCausa: ");
+            e.printStackTrace();
+            leitor.nextLine();
+        }
+    }
+
+    public static HistoricoStatusSolicitacao buscarUltimoStatusSolicitacao(Long solicitacao){
+        try (Connection conexao = Conexao.getConexao();
+             PreparedStatement query = conexao.prepareStatement("SELECT * FROM historicostatussolicitacao WHERE hss_solicitacao = ? ORDER BY hss_datamudanca DESC")) {
+
+            query.setLong(1, solicitacao);
+            ResultSet status = query.executeQuery();
+
+            return new HistoricoStatusSolicitacao(
+                    status.getLong("hss_id"),
+                    SolicitacaoDAO.buscarSolicitacao(status.getLong("hss_solicitacao")),
+                    UsuarioDAO.buscarUsuario(status.getLong("hss_gerente")),
+                    StatusSolicitacao.valueOf(status.getString("hss_status")),
+                    status.getTimestamp("hss_id").toLocalDateTime(),
+                    status.getString("hss_resposta")
+                    );
+        } catch (Exception e) {
+            System.out.print("\n❌ Ocorreu um erro ao tentar buscar o último status da Solicitação!\n\nCausa: ");
+            e.printStackTrace();
+            leitor.nextLine();
+            return null;
+        }
+    }
+
     public static StatusSolicitacao buscarProximoStatusSolicitacao(Long solicitacao){
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement query = conexao.prepareStatement("SELECT hss_status FROM historicostatussolicitacao WHERE hss_solicitacao = ? ORDER BY hss_datamudanca DESC")) {
@@ -94,7 +139,7 @@ public class HistoricoStatusSolicitacaoDAO {
                 return StatusSolicitacao.ATENDIMENTO;
             }
         } catch (Exception e) {
-            System.out.print("\n❌ Ocorreu um erro ao tentar buscar a Categoria!\n\nCausa: ");
+            System.out.print("\n❌ Ocorreu um erro ao tentar buscar o próximo status da Solicitação!\n\nCausa: ");
             e.printStackTrace();
             leitor.nextLine();
             return null;

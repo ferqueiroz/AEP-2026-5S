@@ -3,6 +3,7 @@ package org.ObservaAcao.Classes;
 import org.ObservaAcao.Enums.StatusSolicitacao;
 
 import java.time.LocalDateTime;
+import java.util.Scanner;
 
 public class HistoricoStatusSolicitacao {
     private Long id;
@@ -11,6 +12,19 @@ public class HistoricoStatusSolicitacao {
     private StatusSolicitacao status;
     private LocalDateTime dataMudanca;
     private String resposta;
+
+    private static Scanner leitor = new Scanner(System.in);
+
+    public void definirResposta(){
+        String resposta;
+
+        do {
+            System.out.print("Resposta do Status Atual: ");
+            resposta = leitor.nextLine();
+        } while (resposta == "");
+
+        setResposta(resposta);
+    }
 
     public HistoricoStatusSolicitacao(Long id, Solicitacao solicitacao, Usuario gerente, StatusSolicitacao status, LocalDateTime dataMudanca, String resposta) {
         this.id = id;

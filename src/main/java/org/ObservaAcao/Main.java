@@ -20,8 +20,6 @@ public class Main {
 
     public static void solicitacoesMenu(){
         String opcao;
-        String protocolo;
-        Solicitacao solicitacao = null;
 
         do {
             Funcoes.limparConsole();
@@ -32,6 +30,7 @@ public class Main {
                     System.out.println("1 - Criar Solicitação");
                     System.out.println("2 - Listar Todas as Solicitações");
                     System.out.println("3 - Buscar Solicitação por Protocolo");
+                    System.out.println("4 - Deletar Solicitação");
                     System.out.println("0 - Voltar\n");
                     System.out.print("Opção: ");
 
@@ -47,6 +46,10 @@ public class Main {
                             break;
                         case "3":
                             Solicitacao.buscarSolicitacaoPorProtocolo();
+                            Funcoes.pressioneVoltar();
+                            break;
+                        case "4":
+                            Solicitacao.deletarSolicitacao();
                             break;
                         case "0":
                             return;
@@ -70,6 +73,11 @@ public class Main {
                             break;
                         case "2":
                             Solicitacao.buscarSolicitacaoPorProtocolo();
+                            Funcoes.pressioneVoltar();
+                            break;
+                        case "3":
+                            Solicitacao.mudarStatusResponderSolicitacao();
+                            Funcoes.pressioneVoltar();
                             break;
                         case "0":
                             return;

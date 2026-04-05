@@ -10,6 +10,7 @@ import org.ObservaAcao.Utilidades.Funcoes;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -43,8 +44,9 @@ public class SolicitacaoDAO {
                         solicitacoes.getString("slc_descricao"),
                         solicitacoes.getBytes("slc_anexo"),
                         solicitacoes.getInt("slc_prioridade"),
-                        StatusSolicitacao.valueOf(solicitacoes.getString("slc_status")))
-                );
+                        StatusSolicitacao.valueOf(solicitacoes.getString("slc_status")),
+                        solicitacoes.getString("slc_localizacao")
+                ));
             }
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar listar as Solicitacoes!\n\nCausa: ");
@@ -71,7 +73,9 @@ public class SolicitacaoDAO {
                             solicitacao.getString("slc_descricao"),
                             solicitacao.getBytes("slc_anexo"),
                             solicitacao.getInt("slc_prioridade"),
-                            StatusSolicitacao.valueOf(solicitacao.getString("slc_status"))
+                            StatusSolicitacao.valueOf(solicitacao.getString("slc_status")),
+                            solicitacao.getString("slc_localizacao")
+
                     ) : null;
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar buscar a Solicitacao!\n\nCausa: ");
@@ -97,7 +101,8 @@ public class SolicitacaoDAO {
                             solicitacao.getString("slc_descricao"),
                             solicitacao.getBytes("slc_anexo"),
                             solicitacao.getInt("slc_prioridade"),
-                            StatusSolicitacao.valueOf(solicitacao.getString("slc_status"))
+                            StatusSolicitacao.valueOf(solicitacao.getString("slc_status")),
+                            solicitacao.getString("slc_localizacao")
                     ) : null;
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar buscar a Solicitacao!\n\nCausa: ");
@@ -111,17 +116,19 @@ public class SolicitacaoDAO {
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement query = conexao.prepareStatement(
                      "INSERT INTO solicitacoes " +
-                         "(slc_usuario, slc_protocolo, slc_categoria, slc_descricao, slc_anexo, slc_prioridade, slc_status) " +
-                         "VALUES(?, ?, ?, ?, ?, ?, ?)",
+                         "(slc_usuario, slc_protocolo, slc_categoria, slc_descricao, slc_anexo, slc_prioridade, slc_status, slc_localizacao) " +
+                         "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                      PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            query.setLong(1, solicitacao.getUsuario().getId());
+            if (solicitacao.getUsuario() != null) query.setLong(1, solicitacao.getUsuario().getId());
+            else query.setNull(1, Types.BIGINT);
             query.setString(2, solicitacao.getProtocolo());
             query.setLong(3, solicitacao.getCategoria().getId());
             query.setString(4, solicitacao.getDescricao());
             query.setBytes(5, solicitacao.getAnexo());
             query.setInt(6, solicitacao.getPrioridade());
             query.setString(7, solicitacao.getStatus().getStatusSolicitacao());
+            query.setString(8, solicitacao.getLocalizacao());
             query.executeUpdate();
 
             ResultSet resultado = query.getGeneratedKeys();
@@ -129,6 +136,7 @@ public class SolicitacaoDAO {
             if(resultado.next()) solicitacao.setId(resultado.getLong(1));
 
             System.out.println("\n✅ Solicitacao criada com sucesso!\n");
+            System.out.printf("Nrº de Protocolo: %s\n\n", solicitacao.getProtocolo());
             Funcoes.pressioneContinuar();
         } catch (Exception e) {
             solicitacao = null;
@@ -142,7 +150,7 @@ public class SolicitacaoDAO {
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement query = conexao.prepareStatement(
                      "UPDATE solicitacoes " +
-                         "   SET slc_usuario = ?, slc_protocolo = ?, slc_categoria = ?, slc_descricao = ?, slc_anexo = ?, slc_prioridade = ?, slc_status = ? " +
+                         "   SET slc_usuario = ?, slc_protocolo = ?, slc_categoria = ?, slc_descricao = ?, slc_anexo = ?, slc_prioridade = ?, slc_status = ?, slc_localizacao = ? " +
                          " WHERE slc_id = ?")) {
 
             query.setLong(1, solicitacao.getUsuario().getId());
@@ -152,7 +160,8 @@ public class SolicitacaoDAO {
             query.setBytes(5, solicitacao.getAnexo());
             query.setInt(6, solicitacao.getPrioridade());
             query.setString(7, solicitacao.getStatus().getStatusSolicitacao());
-            query.setLong(8, id);
+            query.setString(8, solicitacao.getLocalizacao());
+            query.setLong(9, id);
             query.executeUpdate();
 
             System.out.println("\n✅ Solicitacao atualizada com sucesso!\n");
