@@ -8,6 +8,7 @@ import org.ObservaAcao.Enums.StatusSolicitacao;
 import org.ObservaAcao.Utilidades.Funcoes;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -32,7 +33,9 @@ public class HistoricoStatusSolicitacaoDAO {
                         StatusSolicitacao.fromString(histStatusSolic.getString("hss_status")),
                         histStatusSolic.getTimestamp("hss_dataMudanca").toLocalDateTime(),
                         histStatusSolic.getString("hss_resposta"),
-                        histStatusSolic.getTimestamp("hss_datafinalizacao").toLocalDateTime()
+                        histStatusSolic.getTimestamp("hss_datafinalizacao") != null
+                        ? histStatusSolic.getTimestamp("hss_datafinalizacao").toLocalDateTime()
+                        : null
                 ));
             }
         } catch (Exception e) {
@@ -113,7 +116,9 @@ public class HistoricoStatusSolicitacaoDAO {
                     StatusSolicitacao.fromString(status.getString("hss_status")),
                     status.getTimestamp("hss_datamudanca").toLocalDateTime(),
                     status.getString("hss_resposta"),
-                    status.getTimestamp("hss_datafinalizacao").toLocalDateTime()
+                    status.getTimestamp("hss_datafinalizacao") != null
+                    ? status.getTimestamp("hss_datafinalizacao").toLocalDateTime()
+                    : null
                     );
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar buscar o último status da Solicitação!\n\nCausa: ");

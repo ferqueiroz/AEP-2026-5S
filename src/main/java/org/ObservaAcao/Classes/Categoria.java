@@ -58,6 +58,7 @@ public class Categoria {
         do{
             categoria = new Categoria();
 
+            Funcoes.limparConsole();
             categoria.definirDescricao();
 
             if (id == 0) CategoriaDAO.criarCategoria(categoria);

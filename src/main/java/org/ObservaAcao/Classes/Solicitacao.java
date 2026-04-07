@@ -297,6 +297,7 @@ public class Solicitacao {
         do {
             solicitacao = new Solicitacao();
 
+            Funcoes.limparConsole();
             solicitacao.setProtocolo(gerarProtocolo());
             solicitacao.definirCategoria();
             solicitacao.definirDescricao();
