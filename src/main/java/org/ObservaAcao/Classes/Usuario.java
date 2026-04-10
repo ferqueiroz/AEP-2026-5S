@@ -77,26 +77,26 @@ public class Usuario {
         setNome(nome);
     }*/
 
-    public void definirNome() {
-        String nome = lerNomeValido();
-        setNome(nome);
-    }
-
-    private String lerNomeValido() {
-        String nome;
+    public void definirNome(boolean registrando) {
+        String nomeInformado;
 
         do {
             System.out.print("Nome do Usuário: ");
-            nome = leitor.nextLine().trim();
+            nomeInformado = leitor.nextLine().trim();
 
-            if (nome.isEmpty()) {
+            if (nomeInformado.isEmpty()) {
                 System.out.println("Nome não pode ser vazio.");
                 continue;
             }
 
-        } while (nome.isEmpty());
+            if (registrando && UsuarioDAO.buscarUsuario(nomeInformado) != null) {
+                System.out.println("\nEsse nome de usuário já foi cadastrado!\n");
+                nomeInformado = "";
+            }
 
-        return nome;
+        } while (nomeInformado.isEmpty());
+
+        setNome(nomeInformado);
     }
 
     public void definirSenha(){
@@ -105,7 +105,7 @@ public class Usuario {
         do {
             System.out.print("Senha do Usuário: ");
             senha = leitor.nextLine();
-        } while (senha == "");
+        } while (senha.isEmpty());
 
         setSenha(senha);
     }
@@ -136,27 +136,27 @@ public class Usuario {
     }
 
     public static Usuario logarUsuario() {
-        Usuario usuario;
+        Usuario usuarioValidado;
 
         do {
-            usuario = new Usuario();
+            Usuario temp = new Usuario();
 
             Funcoes.limparConsole();
             System.out.println("-=Login=-\n");
 
-            usuario.definirNome();
-            usuario.definirSenha();
+            temp.definirNome(false);
+            temp.definirSenha();
 
-            usuario = UsuarioDAO.buscarUsuario(usuario.getNome(), usuario.getSenha());
+            usuarioValidado = UsuarioDAO.buscarUsuario(temp.getNome(), temp.getSenha());
 
-            if (usuario == null) {
+            if (usuarioValidado == null) {
                 System.out.println("\nUsuário inválido!\n");
                 System.out.print("Pressione ENTER para continuar...");
                 leitor.nextLine();
             }
-        } while (usuario == null);
+        } while (usuarioValidado == null);
 
-        return usuario;
+        return usuarioValidado;
     }
 
     public static Usuario registrarUsuario() {

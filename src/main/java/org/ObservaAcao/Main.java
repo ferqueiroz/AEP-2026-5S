@@ -1,14 +1,14 @@
 package org.ObservaAcao;
 
+import org.ObservaAcao.Classes.Categoria;
 import org.ObservaAcao.Classes.Usuario;
 import org.ObservaAcao.DAOs.CategoriaDAO;
 import org.ObservaAcao.Enums.TipoUsuario;
+import org.ObservaAcao.Menus.CidadaoMenu;
+import org.ObservaAcao.Menus.GerenteMenu;
 import org.ObservaAcao.Utilidades.Funcoes;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Scanner;
-
 
 public class Main {
     public static Usuario usuarioConectado = null;
@@ -144,7 +144,7 @@ public class Main {
                             Categoria.listarCategorias();
                             System.out.print("Digite o código da categoria (0 para voltar): ");
 
-                            id = leitor.nextLong();
+                            id = Long.parseLong(leitor.nextLine()); // Corrigido bug do buffer
 
                             if (id == 0) continue;
 
@@ -156,7 +156,7 @@ public class Main {
                             Categoria.listarCategorias();
                             System.out.print("Digite o código da categoria (0 para voltar): ");
 
-                            id = leitor.nextLong();
+                            id = Long.parseLong(leitor.nextLine()); // Corrigido bug do buffer
 
                             if (id == 0) continue;
 
@@ -173,10 +173,10 @@ public class Main {
                 default:
                     return;
             }
-        } while (opcao != "0");
+        } while (!opcao.equals("0"));
     }
 
-    static void main() {
+    public static void main(String[] args) {
         String opcao;
 
         do {
@@ -188,9 +188,9 @@ public class Main {
             System.out.println("0 - Sair");
             System.out.print("\nOpção: ");
 
-            String opcao = leitor.nextLine();
+            opcao = leitor.nextLine();
 
-            switch (opcao){
+            switch (opcao) {
                 case "1":
                     usuarioConectado = Usuario.logarUsuario();
                     break;
@@ -198,22 +198,29 @@ public class Main {
                     usuarioConectado = Usuario.registrarUsuario();
                     break;
                 case "0":
+                    System.out.println("Saindo...");
                     return;
                 default:
                     continue;
             }
 
-            switch (usuarioConectado.getTipoUsuario()){
-                case CIDADAO:
-                    CidadaoMenu.menu();
-                    break;
-                case GERENTE:
-                    GerenteMenu.menu();
-                    break;
-                default:
-                    System.out.println("\nNão foi gerado um menu para esse tipo de usuário\n");
-                    Funcoes.pressioneContinuar();
+            if (usuarioConectado != null) {
+                switch (usuarioConectado.getTipoUsuario()) {
+                    case CIDADAO:
+                        CidadaoMenu.menu();
+                        break;
+                    case GERENTE:
+                        GerenteMenu.menu();
+                        break;
+                    default:
+                        System.out.println("\nNão foi gerado um menu para esse tipo de usuário\n");
+                        Funcoes.pressioneContinuar();
+                }
+            } else {
+                System.out.println("\nFalha na autenticação. Tente novamente.");
+                Funcoes.pressioneContinuar();
             }
-        }
+
+        } while (!opcao.equals("0"));
     }
 }
