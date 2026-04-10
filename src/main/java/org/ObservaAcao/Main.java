@@ -14,7 +14,7 @@ public class Main {
     public static Usuario usuarioConectado = null;
     public static Scanner leitor = new Scanner(System.in);
 
-    static void main() {
+    public static void main(String[] args) {
         while (true) {
             Funcoes.limparConsole();
 

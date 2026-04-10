@@ -1,14 +1,17 @@
 @echo off
-chcp 65001
+cls
 
-echo Rodando sistema...
-echo.
+call mvn clean compile
+cls
 
-mvn clean compile
-echo.
+if %errorlevel% neq 0 (
+    echo ❌ Erro na compilacao
+    pause
+    exit /b
+)
 
-mvn exec:java -Dexec.mainClass="org.ObservaAcao.Main"
-echo.
+cls
+call mvn exec:java -Dexec.mainClass="org.ObservaAcao.Main"
+cls
 
-echo Fim da execucao
 pause

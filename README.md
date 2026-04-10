@@ -9,7 +9,7 @@ Projeto desenvolvido como parte da **Atividade de Estudo Programada (AEP)** do c
 Desenvolver um sistema que permita ao cidadão:
 
 * Registrar solicitações de serviços públicos
-* Acompanhar o andamento de demandas
+* Acompanhar o andamento das suas solicitações
 * Receber retornos claros e rastreáveis
 * Acessar informações com mais transparência
 
@@ -26,12 +26,6 @@ Este projeto foi idealizado para reduzir barreiras como:
 * Dificuldade de acompanhamento de solicitações
 * Desigualdade no acesso a serviços
 * Falta de confiança nas instituições
-
-A solução está alinhada com os ODS:
-
-* ODS 16 — Paz, Justiça e Instituições Eficazes
-* ODS 10 — Redução das Desigualdades
-* ODS 11 — Cidades e Comunidades Sustentáveis
 
 ---
 
@@ -64,6 +58,49 @@ A solução está alinhada com os ODS:
 
 ---
 
+## 📗 Como usar o Sistema
+
+* Para conseguir utilizar o nosso sistema é necessário ser instalado o Maven na sua máquina para compilar o "ObservaAcao.bat"
+* Ou simplesmente executar o nosso projeto pela sua IDE de Java
+### 1. Baixar o Maven
+* Acesse o site oficial e baixe a versão zip do apache
+* https://maven.apache.org/download.cgi
+![img.png](Imagens/Maven.png)
+
+### 2. Extrair o Arquivo
+* Extraia o arquivo em alguma pasta, como por exemplo
+
+``C:\Program Files (x86)\Maven``
+
+### 3. Configurar variáveis de ambiente
+* Pressione ``Win + R``
+* Digite ``sysdm.cpl``
+* Aba **Avançado**
+* Clique em **Variáveis de Ambiente**
+
+
+* Crie uma nova variável
+![img.png](Imagens/Criar%20Variavel.png) 
+* Adicione o nome de ``MAVEN_HOME`` 
+* E seu valor com o caminho da sua pasta exemplo ``C:\Program Files (x86)\Maven``
+![img.png](Imagens/Alterar%20nome%20e%20valor.png)
+* Após isso Edite a variável ``Path``
+![img.png](Imagens/Variavel%20Path.png)
+* Adicione um novo com o valor ``%MAVEN_HOME%\bin``
+![img.png](Adicionar%20novo%20Path/img.png)
+
+### 4. Verifique se o Java está instalado
+
+* Execute os seguintes comandos no **cmd**
+``java -version`` e
+``javac -version``
+* O Maven precisa do **Java Development Kit**
+
+### 5. Testar a instalação
+* Abre o **cmd** e digite ``mvn -version``
+
+---
+
 ## 🧠 Etapas do Projeto
 
 ### 📌 1º Bimestre
@@ -78,7 +115,6 @@ A solução está alinhada com os ODS:
 * Usuario
 * Categoria
 * HistoricoStatus
-* FilaAtendimento
 
 ---
 
@@ -98,7 +134,7 @@ Ferramentas utilizadas:
 
 ## 🛠️ Tecnologias
 
-* Java / Python (versão inicial)
+* Java (versão inicial)
 * Spring Boot (evolução)
 * Conceitos de POO
 * Clean Code
