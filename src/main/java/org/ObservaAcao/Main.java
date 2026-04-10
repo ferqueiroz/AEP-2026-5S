@@ -3,6 +3,7 @@ package org.ObservaAcao;
 import org.ObservaAcao.Classes.Categoria;
 import org.ObservaAcao.Classes.Usuario;
 import org.ObservaAcao.DAOs.CategoriaDAO;
+import org.ObservaAcao.Enums.TipoUsuario;
 import org.ObservaAcao.Utilidades.Funcoes;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class Main {
     public static Usuario usuarioConectado = new Usuario();
     public static Scanner leitor = new Scanner(System.in);
 
-    public static void solicitacoesMenu(){
+    /*public static void solicitacoesMenu(){
         String opcao;
 
         do {
@@ -68,6 +69,47 @@ public class Main {
                     return;
             }
         } while (opcao != "0");
+    }*/
+
+    public static void solicitacoesMenu() {
+        String opcao;
+
+        do {
+            Funcoes.limparConsole();
+
+            System.out.println("-=Menu de Solicitações=-\n");
+
+            if (usuarioConectado.getTipoUsuario() == TipoUsuario.CIDADAO) {
+                System.out.println("1 - Criar Solicitação");
+                System.out.println("2 - Listar Todas as Solicitações");
+                System.out.println("3 - Buscar Solicitação por Protocolo");
+            } else {
+                System.out.println("1 - Listar Todas as Solicitações");
+                System.out.println("2 - Buscar Solicitação por Protocolo");
+            }
+
+            System.out.println("0 - Voltar\n");
+            System.out.print("Opção: ");
+
+            opcao = leitor.nextLine();
+
+            switch (opcao) {
+                case "1":
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    if (usuarioConectado.getTipoUsuario() == TipoUsuario.CIDADAO) {
+                        break;
+                    }
+                    break;
+                case "0":
+                    return;
+                default:
+                    continue;
+            }
+
+        } while (!opcao.equals("0"));
     }
 
     public static void categoriasMenu(){

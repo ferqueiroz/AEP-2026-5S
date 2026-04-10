@@ -56,6 +56,7 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
 
+    /*
     public void definirNome(){
         String nome;
 
@@ -65,6 +66,28 @@ public class Usuario {
         } while (nome == "");
 
         setNome(nome);
+    }*/
+
+    public void definirNome() {
+        String nome = lerNomeValido();
+        setNome(nome);
+    }
+
+    private String lerNomeValido() {
+        String nome;
+
+        do {
+            System.out.print("Nome do Usuário: ");
+            nome = leitor.nextLine().trim();
+
+            if (nome.isEmpty()) {
+                System.out.println("Nome não pode ser vazio.");
+                continue;
+            }
+
+        } while (nome.isEmpty());
+
+        return nome;
     }
 
     public void definirSenha(){
