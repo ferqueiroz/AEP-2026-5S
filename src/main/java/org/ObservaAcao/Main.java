@@ -1,18 +1,17 @@
 package org.ObservaAcao;
 
-import org.ObservaAcao.Classes.Categoria;
 import org.ObservaAcao.Classes.Usuario;
 import org.ObservaAcao.DAOs.CategoriaDAO;
 import org.ObservaAcao.Enums.TipoUsuario;
 import org.ObservaAcao.Utilidades.Funcoes;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Scanner;
 
 
 public class Main {
-    public static Usuario usuarioConectado = new Usuario();
+    public static Usuario usuarioConectado = null;
     public static Scanner leitor = new Scanner(System.in);
 
     /*public static void solicitacoesMenu(){
@@ -188,7 +187,8 @@ public class Main {
             System.out.println("2 - Registrar");
             System.out.println("0 - Sair");
             System.out.print("\nOpção: ");
-            opcao = leitor.nextLine();
+
+            String opcao = leitor.nextLine();
 
             switch (opcao){
                 case "1":
@@ -202,52 +202,18 @@ public class Main {
                 default:
                     continue;
             }
-        } while (opcao != "0" && usuarioConectado == null);
 
-        do {
-            Funcoes.limparConsole();
-            System.out.println("-=Menu=-\n");
             switch (usuarioConectado.getTipoUsuario()){
                 case CIDADAO:
-                    System.out.println("1 - Solicitações");
-                    System.out.println("0 - Sair\n");
-                    System.out.print("Opção: ");
-                    opcao = leitor.nextLine();
-
-                    switch (opcao){
-                        case "1":
-                            solicitacoesMenu();
-                            break;
-                        case "0":
-                            return;
-                        default:
-                            continue;
-                    }
-
+                    CidadaoMenu.menu();
                     break;
                 case GERENTE:
-                    System.out.println("1 - Solicitações");
-                    System.out.println("2 - Categorias");
-                    System.out.println("0 - Sair\n");
-                    System.out.print("Opção: ");
-                    opcao = leitor.nextLine();
-
-                    switch (opcao){
-                        case "1":
-                            solicitacoesMenu();
-                            break;
-                        case "2":
-                            categoriasMenu();
-                            break;
-                        case "0":
-                            return;
-                        default:
-                            continue;
-                    }
+                    GerenteMenu.menu();
                     break;
                 default:
-                    return;
+                    System.out.println("\nNão foi gerado um menu para esse tipo de usuário\n");
+                    Funcoes.pressioneContinuar();
             }
-        } while(opcao != "0");
+        }
     }
 }

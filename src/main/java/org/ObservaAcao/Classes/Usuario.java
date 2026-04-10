@@ -58,11 +58,20 @@ public class Usuario {
 
     /*
     public void definirNome(){
+        definirNome(false);
+    }
+
+    public void definirNome(boolean registrando){
         String nome;
 
         do {
             System.out.print("Nome do Usuário: ");
             nome = leitor.nextLine();
+
+            if (registrando && UsuarioDAO.buscarUsuario(nome) != null){
+                System.out.println("\nEsse nome de usuário já foi cadastrado!\n");
+                nome = "";
+            }
         } while (nome == "");
 
         setNome(nome);
@@ -156,11 +165,13 @@ public class Usuario {
         Funcoes.limparConsole();
         System.out.println("-=Registrar=-\n");
 
-        usuario.definirNome();
+        usuario.definirNome(true);
         usuario.definirSenha();
         usuario.definirTipoUsuario();
 
         UsuarioDAO.criarUsuario(usuario);
+        Funcoes.pressioneContinuar();
+
         return usuario;
     }
 }

@@ -58,6 +58,7 @@ public class Categoria {
         do{
             categoria = new Categoria();
 
+            Funcoes.limparConsole();
             categoria.definirDescricao();
 
             if (id == 0) CategoriaDAO.criarCategoria(categoria);
@@ -68,13 +69,11 @@ public class Categoria {
     }
 
     public static void listarCategorias(){
-        List<Categoria> categorias = new ArrayList<>();
-
-        categorias = CategoriaDAO.listarCategorias();
+        List<Categoria> categorias = CategoriaDAO.listarCategorias();
 
         if (categorias.isEmpty()){
-            System.out.print("Não existe nenhuma categoria cadastrada!\n\nPressione ENTER para voltar...");
-            leitor.nextLine();
+            System.out.print("Não existe nenhuma categoria cadastrada!\n");
+            Funcoes.pressioneVoltar();
             return;
         }
 

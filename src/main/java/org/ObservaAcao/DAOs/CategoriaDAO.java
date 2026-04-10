@@ -104,7 +104,7 @@ public class CategoriaDAO {
             query.setLong(1, id);
             query.executeUpdate();
 
-            System.out.println("🗑️ Categoria deletada com sucesso!");
+            System.out.println("🗑️ Categoria deletada com sucesso!\n");
             Funcoes.pressioneContinuar();
         } catch (Exception e) {
             System.out.print("\n❌ Ocorreu um erro ao tentar deletar a Categoria!\n\nCausa: ");

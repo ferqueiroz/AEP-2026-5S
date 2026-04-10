@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Funcoes {
-    private static Scanner leitor = new Scanner(System.in);
+    public static Scanner leitor = new Scanner(System.in);
 
     /*
     public static void limparConsole(){
